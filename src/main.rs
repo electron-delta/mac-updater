@@ -1,38 +1,29 @@
-#[macro_use] extern crate log;
-extern crate simplelog;
-
-use simplelog::*;
-use std::fs::File;
 use std::env;
 use std::path::Path;
 use std::process::Command;
 use std::{thread, time::Duration};
 
 fn kill_process(name: &str) {
-  let output = Command::new("killall")
+  Command::new("killall")
     .arg(name)
     .output()
     .expect("failed to execute process");
-  info!("{}", String::from_utf8_lossy(&output.stdout));
-  info!("{}", String::from_utf8_lossy(&output.stderr));
 }
 
 fn open_app(name: &str) {
   let full_app_name = format!("{}.app", name);
-  let output = Command::new("open")
+   Command::new("open")
     .arg("-a")
     .arg(full_app_name)
     .output()
     .expect("failed to execute process");
-  info!("{}", String::from_utf8_lossy(&output.stdout));
-  info!("{}", String::from_utf8_lossy(&output.stderr));
 }
 
 fn hpatchz_app(hpatchz_path: &str, delta_path: &str, app_name: &str) {
   let path = Path::new(hpatchz_path);
   let app_path = format!("/Applications/{}.app", app_name);
 
-  let output = Command::new(path)
+   Command::new(path)
     .arg("-C-all")
     .arg(&app_path)
     .arg(delta_path)
@@ -40,22 +31,13 @@ fn hpatchz_app(hpatchz_path: &str, delta_path: &str, app_name: &str) {
     .arg("-f")
     .output()
     .expect("failed to execute hpatchz process");
-
-  info!("{}", String::from_utf8_lossy(&output.stdout));
-  info!("{}", String::from_utf8_lossy(&output.stderr));
 }
 
 fn help() {
-  info!("Usage: mac-updater <app-name> <delta-path> <hpatchz-path>");
+  print!("Usage: mac-updater <app-name> <delta-path> <hpatchz-path>");
 }
 
 fn main() {
-
-  CombinedLogger::init(
-        vec![
-            WriteLogger::new(LevelFilter::Info, Config::default(), File::create("mac_updater.log").unwrap()),
-        ]
-    ).unwrap();
 
   let args: Vec<String> = env::args().collect();
 
